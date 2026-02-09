@@ -1,0 +1,58 @@
+entry: gh-start
+nodes:
+  - id: gh-start
+    type: core/gh-start@v1
+    position:
+      x: -150
+      y: 20
+  - id: checkout
+    type: github.com/actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+    position:
+      x: 270
+      y: 660
+  - id: setup-php
+    type: github.com/shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1
+    position:
+      x: 810
+      y: 610
+    inputs:
+      php-version: '8.4'
+  - id: run
+    type: core/run@v1
+    position:
+      x: 1290
+      y: 540
+    inputs:
+      script: php index.php
+connections: []
+executions:
+  - src:
+      node: gh-start
+      port: exec-on_push
+    dst:
+      node: checkout
+      port: exec
+  - src:
+      node: gh-start
+      port: exec-on_pull_request
+    dst:
+      node: checkout
+      port: exec
+  - src:
+      node: gh-start
+      port: exec-on_workflow_dispatch
+    dst:
+      node: checkout
+      port: exec
+  - src:
+      node: checkout
+      port: exec-success
+    dst:
+      node: setup-php
+      port: exec
+  - src:
+      node: setup-php
+      port: exec-success
+    dst:
+      node: run
+      port: exec
